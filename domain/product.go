@@ -13,8 +13,6 @@ var (
 	ErrProductAlreadyExists      = errors.New("product already exists")
 	ErrProductNotFound           = errors.New("requested product not found")
 	ErrProductInsert             = errors.New("failed to create the product")
-	ErrProductNameTooShort       = errors.New("product name must be greater that 5 character")
-	ErrProductPriceNegative      = errors.New("product price must be greater or equal to 0")
 	ErrProductGet                = errors.New("failed to get the product")
 	ErrProductsGet               = errors.New("unknown error occurred while getting products")
 	ErrProductUpdate             = errors.New("failed to update the product")
@@ -44,7 +42,8 @@ func (ps *ProductService) InsertProduct(product model.Product) error {
 			}
 			return ErrProductInsert
 		}
-		return err
+		log.Println("[ERROR:InsertProduct]:", err)
+		return ErrProductInsert
 	}
 	return nil
 }
@@ -106,15 +105,6 @@ func (ps *ProductService) UpdateProduct(productId string, product model.Product)
 func (ps *ProductService) DeleteProduct(productId string) error {
 	exec, err := ps.db.Exec("DELETE FROM products WHERE id=$1", productId)
 	if err != nil {
-		pqErr, ok := err.(*pq.Error)
-		if ok {
-			if pqErr.Code == postgresNoDataFoundErrorCode {
-				return ErrProductNotFound
-			} else {
-				log.Println("[Error: DeleteProduct]", "(pq.Error)", pqErr)
-				return ErrProductDelete
-			}
-		}
 		log.Println("[Error: DeleteProduct]", err)
 		return ErrProductDelete
 	}

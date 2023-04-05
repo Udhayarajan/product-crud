@@ -11,15 +11,11 @@ type ErrMock int
 
 const (
 	DBOperationError ErrMock = iota
-	DBConnectionError
-	DBConnectionTimeout
 	DBDuplicateEntry
 	DBNoEntry
 	DBUpdateError
 	DBDeleteError
-	DBUpdateTimeout
-	DBUnauthorizedOperation
-	OK
+	DBAffectedRowMoreThanOneError
 )
 
 // ServiceMock ...
@@ -68,8 +64,8 @@ func (s *ServiceMock) UpdateProduct(productId string, product model.Product) err
 		return domain.ErrProductUpdate
 	}
 
-	if s.Err == DBNoEntry {
-		return domain.ErrProductNotFound
+	if s.Err == DBAffectedRowMoreThanOneError {
+		return domain.ErrProductUnExpectedAffected
 	}
 
 	return nil
@@ -78,6 +74,9 @@ func (s *ServiceMock) UpdateProduct(productId string, product model.Product) err
 func (s *ServiceMock) DeleteProduct(productId string) error {
 	if s.Err == DBDeleteError {
 		return domain.ErrProductDelete
+	}
+	if s.Err == DBAffectedRowMoreThanOneError {
+		return domain.ErrProductUnExpectedAffected
 	}
 	return nil
 }

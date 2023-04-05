@@ -27,12 +27,6 @@ func (ph ProductHandler) InsertProductHandler(c *gin.Context) {
 			})
 			return
 		}
-		if errors.Is(err, domain.ErrProductNameTooShort) || errors.Is(err, domain.ErrProductPriceNegative) {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
 
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
